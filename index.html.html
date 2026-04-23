@@ -1,0 +1,558 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Amazon Depot Orchestrator — Vanshika Thakkar</title>
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:ital,wght@0,300;0,400;0,500;0,700;1,300&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --black: #080808;
+    --white: #F5F2EC;
+    --amber: #FF6B00;
+    --amber-dim: #CC5500;
+    --navy: #0D1B2A;
+    --slate: #1A2E42;
+    --muted: #8A9BAD;
+    --card: #111D28;
+    --border: rgba(255,107,0,0.15);
+  }
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  html { scroll-behavior: smooth; }
+  body { background: var(--navy); color: var(--white); font-family: 'DM Sans', sans-serif; font-weight: 300; line-height: 1.6; overflow-x: hidden; }
+
+  body::before {
+    content: '';
+    position: fixed; inset: 0;
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.04'/%3E%3C/svg%3E");
+    pointer-events: none; z-index: 999; opacity: 0.4;
+  }
+
+  /* NAV */
+  nav { position: fixed; top: 0; left: 0; right: 0; z-index: 100; display: flex; justify-content: space-between; align-items: center; padding: 1.25rem 3rem; background: rgba(13,27,42,0.9); backdrop-filter: blur(12px); border-bottom: 1px solid var(--border); }
+  .nav-logo { font-family: 'DM Mono', monospace; font-size: 0.75rem; color: var(--amber); letter-spacing: 0.1em; text-transform: uppercase; }
+  .nav-links { display: flex; gap: 2rem; list-style: none; }
+  .nav-links a { font-size: 0.78rem; color: var(--muted); text-decoration: none; letter-spacing: 0.08em; text-transform: uppercase; transition: color 0.2s; }
+  .nav-links a:hover { color: var(--amber); }
+
+  /* HERO */
+  .hero { min-height: 100vh; display: grid; grid-template-columns: 1fr 1fr; align-items: center; padding: 8rem 3rem 4rem; position: relative; overflow: hidden; }
+  .hero::after { content: ''; position: absolute; right: -10%; top: 10%; width: 55%; height: 80%; background: radial-gradient(ellipse at center, rgba(255,107,0,0.12) 0%, transparent 70%); pointer-events: none; }
+  .hero-tag { font-family: 'DM Mono', monospace; font-size: 0.7rem; color: var(--amber); letter-spacing: 0.2em; text-transform: uppercase; margin-bottom: 1.5rem; display: flex; align-items: center; gap: 0.75rem; }
+  .hero-tag::before { content: ''; display: inline-block; width: 2rem; height: 1px; background: var(--amber); }
+  .hero h1 { font-family: 'Bebas Neue', sans-serif; font-size: clamp(4rem, 8vw, 7.5rem); line-height: 0.92; letter-spacing: 0.02em; margin-bottom: 2rem; }
+  .hero h1 span { color: var(--amber); display: block; }
+  .hero-sub { font-size: 1rem; color: var(--muted); max-width: 420px; line-height: 1.7; margin-bottom: 2.5rem; }
+  .hero-meta { display: flex; flex-wrap: wrap; gap: 1rem; margin-bottom: 2.5rem; }
+  .meta-pill { font-family: 'DM Mono', monospace; font-size: 0.7rem; letter-spacing: 0.1em; padding: 0.4rem 0.9rem; border: 1px solid rgba(255,107,0,0.3); border-radius: 2px; color: var(--amber); background: rgba(255,107,0,0.06); }
+  .hero-cta { display: inline-flex; align-items: center; gap: 0.75rem; background: var(--amber); color: var(--black); font-family: 'DM Sans', sans-serif; font-weight: 700; font-size: 0.85rem; letter-spacing: 0.08em; text-transform: uppercase; padding: 0.9rem 2rem; text-decoration: none; transition: background 0.2s, transform 0.2s; }
+  .hero-cta:hover { background: var(--amber-dim); transform: translateY(-2px); }
+  .hero-right { display: flex; flex-direction: column; gap: 1.5rem; padding-left: 4rem; position: relative; z-index: 1; }
+  .big-stat { border-left: 3px solid var(--amber); padding-left: 1.5rem; }
+  .big-stat .num { font-family: 'Bebas Neue', sans-serif; font-size: 3.5rem; line-height: 1; }
+  .big-stat .label { font-size: 0.78rem; color: var(--muted); margin-top: 0.2rem; }
+
+  /* SECTIONS */
+  .section-wrap { padding: 6rem 3rem; max-width: 1200px; margin: 0 auto; }
+  .section-label { font-family: 'DM Mono', monospace; font-size: 0.68rem; color: var(--amber); letter-spacing: 0.2em; text-transform: uppercase; margin-bottom: 1rem; display: flex; align-items: center; gap: 0.75rem; }
+  .section-label::before { content: ''; display: inline-block; width: 1.5rem; height: 1px; background: var(--amber); }
+  .section-title { font-family: 'Bebas Neue', sans-serif; font-size: clamp(2.5rem, 5vw, 4rem); line-height: 1; letter-spacing: 0.03em; margin-bottom: 3rem; }
+  .divider { width: 100%; height: 1px; background: linear-gradient(90deg, var(--amber) 0%, rgba(255,107,0,0.1) 60%, transparent 100%); }
+
+  /* IMPACT GRID */
+  .impact-bg { background: var(--black); padding: 6rem 3rem; position: relative; overflow: hidden; }
+  .impact-bg::before { content: ''; position: absolute; left: -5%; top: -20%; width: 40%; height: 140%; background: radial-gradient(ellipse, rgba(255,107,0,0.08) 0%, transparent 70%); pointer-events: none; }
+  .impact-inner { max-width: 1200px; margin: 0 auto; }
+  .impact-grid { display: grid; grid-template-columns: repeat(4, 1fr); border: 1px solid rgba(255,107,0,0.2); }
+  .impact-card { padding: 2.5rem 2rem; border-right: 1px solid rgba(255,107,0,0.1); text-align: center; }
+  .impact-card:last-child { border-right: none; }
+  .impact-num { font-family: 'Bebas Neue', sans-serif; font-size: 3.5rem; line-height: 1; color: var(--amber); margin-bottom: 0.5rem; }
+  .impact-label { font-size: 0.78rem; color: var(--muted); line-height: 1.5; }
+  .impact-source { font-family: 'DM Mono', monospace; font-size: 0.6rem; color: rgba(138,155,173,0.5); margin-top: 0.75rem; }
+
+  /* PROBLEM GRID */
+  .problem-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1.5px; background: rgba(255,107,0,0.15); border: 1px solid rgba(255,107,0,0.15); }
+  .problem-card { background: var(--card); padding: 2rem 1.75rem; position: relative; overflow: hidden; transition: background 0.3s; }
+  .problem-card:hover { background: var(--slate); }
+  .problem-card::before { content: attr(data-num); position: absolute; top: 1rem; right: 1.25rem; font-family: 'Bebas Neue', sans-serif; font-size: 4rem; color: rgba(255,107,0,0.08); line-height: 1; }
+  .problem-icon { font-size: 1.5rem; margin-bottom: 1rem; }
+  .problem-card h3 { font-weight: 700; font-size: 0.9rem; color: var(--amber); letter-spacing: 0.05em; text-transform: uppercase; margin-bottom: 0.6rem; }
+  .problem-card p { font-size: 0.85rem; color: var(--muted); line-height: 1.6; }
+
+  /* COMP TABLE */
+  .comp-table { width: 100%; border-collapse: collapse; font-size: 0.85rem; }
+  .comp-table th { font-family: 'DM Mono', monospace; font-size: 0.65rem; letter-spacing: 0.15em; text-transform: uppercase; color: var(--amber); padding: 1rem 1.5rem; text-align: left; border-bottom: 1px solid rgba(255,107,0,0.3); }
+  .comp-table td { padding: 1.1rem 1.5rem; border-bottom: 1px solid rgba(255,255,255,0.04); color: var(--muted); vertical-align: top; }
+  .comp-table tr:hover td { background: rgba(255,107,0,0.04); color: var(--white); }
+  .comp-table td:first-child { color: var(--white); font-weight: 500; }
+  .amazon-row td { background: rgba(255,107,0,0.06); }
+  .amazon-row td:first-child { color: var(--amber); }
+
+  /* ROADMAP */
+  .roadmap { display: grid; grid-template-columns: repeat(4, 1fr); position: relative; }
+  .roadmap::before { content: ''; position: absolute; top: 2.25rem; left: 0; right: 0; height: 2px; background: linear-gradient(90deg, var(--amber) 0%, rgba(255,107,0,0.3) 100%); z-index: 0; }
+  .road-step { padding: 0 1.5rem; padding-top: 5rem; position: relative; z-index: 1; }
+  .road-dot { position: absolute; top: 1.5rem; left: 1.5rem; width: 1.5rem; height: 1.5rem; background: var(--amber); border-radius: 50%; border: 3px solid var(--navy); }
+  .road-phase { font-family: 'DM Mono', monospace; font-size: 0.65rem; color: var(--amber); letter-spacing: 0.15em; margin-bottom: 0.5rem; }
+  .road-title { font-weight: 700; font-size: 0.9rem; margin-bottom: 0.5rem; }
+  .road-desc { font-size: 0.78rem; color: var(--muted); line-height: 1.6; }
+
+  /* ===== EXPANDABLE DELIVERABLES ===== */
+  .deliverables-section { padding: 6rem 3rem; max-width: 1200px; margin: 0 auto; }
+  .deliverable-item { border: 1px solid var(--border); margin-bottom: 1px; background: var(--card); transition: border-color 0.3s; }
+  .deliverable-item.open { border-color: rgba(255,107,0,0.4); }
+  .deliverable-trigger { width: 100%; display: flex; align-items: center; justify-content: space-between; padding: 1.75rem 2rem; cursor: pointer; background: none; border: none; color: var(--white); text-align: left; transition: background 0.2s; }
+  .deliverable-trigger:hover { background: rgba(255,107,0,0.04); }
+  .trigger-left { display: flex; align-items: center; gap: 1.5rem; }
+  .trigger-num { font-family: 'DM Mono', monospace; font-size: 0.65rem; color: var(--amber); letter-spacing: 0.15em; min-width: 2.5rem; }
+  .trigger-title { font-family: 'DM Sans', sans-serif; font-weight: 700; font-size: 1rem; }
+  .trigger-desc { font-size: 0.8rem; color: var(--muted); margin-top: 0.2rem; }
+  .trigger-arrow { color: var(--amber); font-size: 1.2rem; transition: transform 0.3s; flex-shrink: 0; }
+  .deliverable-item.open .trigger-arrow { transform: rotate(180deg); }
+  .deliverable-body { max-height: 0; overflow: hidden; transition: max-height 0.5s ease; }
+  .deliverable-body-inner { padding: 0 2rem 2rem; border-top: 1px solid var(--border); padding-top: 2rem; }
+
+  /* INNER CONTENT STYLES */
+  .inner-grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 2rem; margin-bottom: 2rem; }
+  .inner-grid-3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1.5rem; margin-bottom: 2rem; }
+  .inner-grid-4 { display: grid; grid-template-columns: repeat(4, 1fr); gap: 1.5rem; margin-bottom: 2rem; }
+  .inner-card { background: rgba(255,107,0,0.04); border: 1px solid var(--border); padding: 1.5rem; }
+  .inner-card h4 { font-weight: 700; font-size: 0.85rem; color: var(--amber); margin-bottom: 0.6rem; text-transform: uppercase; letter-spacing: 0.05em; }
+  .inner-card p, .inner-card li { font-size: 0.82rem; color: var(--muted); line-height: 1.65; }
+  .inner-card ul { padding-left: 1rem; }
+  .inner-card li { margin-bottom: 0.35rem; }
+  .inner-table { width: 100%; border-collapse: collapse; font-size: 0.82rem; }
+  .inner-table th { font-family: 'DM Mono', monospace; font-size: 0.62rem; letter-spacing: 0.12em; text-transform: uppercase; color: var(--amber); padding: 0.75rem 1rem; text-align: left; border-bottom: 1px solid rgba(255,107,0,0.3); }
+  .inner-table td { padding: 0.85rem 1rem; border-bottom: 1px solid rgba(255,255,255,0.04); color: var(--muted); font-size: 0.82rem; vertical-align: top; }
+  .inner-table td:first-child { color: var(--white); font-weight: 500; }
+  .inner-table tr:hover td { background: rgba(255,107,0,0.03); }
+  .highlight-box { background: rgba(255,107,0,0.08); border-left: 3px solid var(--amber); padding: 1.25rem 1.5rem; margin-bottom: 1.5rem; }
+  .highlight-box p { font-size: 0.85rem; color: var(--white); line-height: 1.7; }
+  .tag-row { display: flex; flex-wrap: wrap; gap: 0.5rem; margin-top: 1rem; }
+  .tag { font-family: 'DM Mono', monospace; font-size: 0.65rem; padding: 0.3rem 0.7rem; border: 1px solid rgba(255,107,0,0.25); color: var(--amber); background: rgba(255,107,0,0.05); }
+  .swot-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 1px; background: rgba(255,107,0,0.1); margin-bottom: 1.5rem; }
+  .swot-card { padding: 1.5rem; background: var(--card); }
+  .swot-card h4 { font-weight: 700; font-size: 0.8rem; margin-bottom: 0.75rem; letter-spacing: 0.08em; text-transform: uppercase; }
+  .swot-card.s h4 { color: #4CAF50; }
+  .swot-card.w h4 { color: #FF5252; }
+  .swot-card.o h4 { color: #FF9800; }
+  .swot-card.t h4 { color: #9C27B0; }
+  .swot-card ul { padding-left: 1rem; }
+  .swot-card li { font-size: 0.8rem; color: var(--muted); margin-bottom: 0.4rem; line-height: 1.5; }
+  .persona-card { background: var(--card); border: 1px solid var(--border); padding: 1.5rem; }
+  .persona-header { display: flex; align-items: center; gap: 1rem; margin-bottom: 1rem; }
+  .persona-avatar { width: 3rem; height: 3rem; background: rgba(255,107,0,0.15); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 1.25rem; flex-shrink: 0; }
+  .persona-name { font-weight: 700; font-size: 0.9rem; }
+  .persona-role { font-family: 'DM Mono', monospace; font-size: 0.65rem; color: var(--amber); letter-spacing: 0.1em; }
+  .persona-detail { font-size: 0.78rem; color: var(--muted); margin-bottom: 0.4rem; }
+  .persona-quote { font-size: 0.82rem; color: var(--white); font-style: italic; border-left: 2px solid var(--amber); padding-left: 0.75rem; margin: 1rem 0; line-height: 1.6; }
+  .issue-branch { margin-bottom: 1.5rem; }
+  .issue-branch-title { font-family: 'DM Mono', monospace; font-size: 0.7rem; color: var(--amber); letter-spacing: 0.1em; text-transform: uppercase; padding: 0.5rem 0.75rem; background: rgba(255,107,0,0.08); border-left: 3px solid var(--amber); margin-bottom: 0.75rem; }
+  .issue-items { display: flex; flex-wrap: wrap; gap: 0.5rem; }
+  .issue-item { font-size: 0.75rem; color: var(--muted); padding: 0.3rem 0.7rem; background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.08); }
+
+  /* ABOUT */
+  .about-section { background: rgba(255,107,0,0.04); border-top: 1px solid var(--border); border-bottom: 1px solid var(--border); padding: 5rem 3rem; }
+  .about-inner { max-width: 1200px; margin: 0 auto; display: grid; grid-template-columns: 1fr 2fr; gap: 4rem; align-items: center; }
+  .about-name { font-family: 'Bebas Neue', sans-serif; font-size: 3rem; line-height: 1; margin-bottom: 0.5rem; }
+  .about-role { font-family: 'DM Mono', monospace; font-size: 0.7rem; color: var(--amber); letter-spacing: 0.15em; text-transform: uppercase; }
+  .about-text { font-size: 0.9rem; color: var(--muted); line-height: 1.8; margin-bottom: 1.5rem; }
+  .about-links { display: flex; gap: 1rem; }
+  .about-link { font-family: 'DM Mono', monospace; font-size: 0.7rem; letter-spacing: 0.1em; color: var(--amber); text-decoration: none; padding: 0.5rem 1rem; border: 1px solid rgba(255,107,0,0.3); transition: background 0.2s; }
+  .about-link:hover { background: var(--amber); color: var(--black); }
+
+  footer { padding: 2rem 3rem; border-top: 1px solid rgba(255,255,255,0.05); display: flex; justify-content: space-between; align-items: center; }
+  footer p { font-family: 'DM Mono', monospace; font-size: 0.65rem; color: rgba(138,155,173,0.5); letter-spacing: 0.08em; }
+
+  @keyframes fadeUp { from { opacity: 0; transform: translateY(30px); } to { opacity: 1; transform: translateY(0); } }
+  .fade-up { opacity: 0; animation: fadeUp 0.7s ease forwards; }
+  .delay-1 { animation-delay: 0.1s; } .delay-2 { animation-delay: 0.25s; } .delay-3 { animation-delay: 0.4s; } .delay-4 { animation-delay: 0.55s; } .delay-5 { animation-delay: 0.7s; }
+
+  @media (max-width: 900px) {
+    .hero { grid-template-columns: 1fr; padding: 7rem 1.5rem 3rem; }
+    .hero-right { padding-left: 0; flex-direction: row; flex-wrap: wrap; }
+    .problem-grid, .inner-grid-3, .inner-grid-4 { grid-template-columns: 1fr; }
+    .inner-grid-2 { grid-template-columns: 1fr; }
+    .impact-grid { grid-template-columns: 1fr 1fr; }
+    .roadmap { grid-template-columns: 1fr 1fr; }
+    .swot-grid { grid-template-columns: 1fr; }
+    .about-inner { grid-template-columns: 1fr; }
+    nav { padding: 1rem 1.5rem; }
+    .section-wrap, .deliverables-section { padding: 4rem 1.5rem; }
+  }
+</style>
+</head>
+<body>
+
+<nav>
+  <div class="nav-logo">VT — Portfolio</div>
+  <ul class="nav-links">
+    <li><a href="#problem">Problem</a></li>
+    <li><a href="#impact">Impact</a></li>
+    <li><a href="#competitive">Competitive</a></li>
+    <li><a href="#deliverables">Deliverables</a></li>
+    <li><a href="#about">About</a></li>
+  </ul>
+</nav>
+
+<!-- HERO -->
+<div class="hero">
+  <div class="hero-left">
+    <div class="hero-tag fade-up delay-1">IS 534 · Information Consulting · UIUC · Dec 2025 · Project Manager</div>
+    <h1 class="fade-up delay-2">Amazon<br><span>Depot</span>Orchestrator</h1>
+    <p class="hero-sub fade-up delay-3">An AI-powered system to eliminate charging congestion, cut energy costs by 40%, and scale Amazon's EV last-mile fleet to 100,000 vehicles by 2030 — across 1,800+ depots globally.</p>
+    <div class="hero-meta fade-up delay-4">
+      <span class="meta-pill">Project Manager</span>
+      <span class="meta-pill">AI Strategy</span>
+      <span class="meta-pill">Market Intelligence</span>
+      <span class="meta-pill">Competitive Analysis</span>
+      <span class="meta-pill">User Research</span>
+    </div>
+    <a href="https://github.com/vanshikathakkar2002" class="hero-cta fade-up delay-5" target="_blank">
+      <svg viewBox="0 0 24 24" fill="currentColor" style="width:16px;height:16px"><path d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205 11.385.6.105.825-.255.825-.57 0-.285-.015-1.23-.015-2.235-3.015.555-3.795-.735-4.035-1.41-.135-.345-.72-1.41-1.23-1.695-.42-.225-1.02-.78-.015-.795.945-.015 1.62.87 1.845 1.23 1.08 1.815 2.805 1.305 3.495.99.105-.78.42-1.305.765-1.605-2.67-.3-5.46-1.335-5.46-5.925 0-1.305.465-2.385 1.23-3.225-.12-.3-.54-1.53.12-3.18 0 0 1.005-.315 3.3 1.23.96-.27 1.98-.405 3-.405s2.04.135 3 .405c2.295-1.56 3.3-1.23 3.3-1.23.66 1.65.24 2.88.12 3.18.765.84 1.23 1.905 1.23 3.225 0 4.605-2.805 5.625-5.475 5.925.435.375.81 1.095.81 2.22 0 1.605-.015 2.895-.015 3.3 0 .315.225.69.825.57A12.02 12.02 0 0024 12c0-6.63-5.37-12-12-12z"/></svg>
+      View on GitHub
+    </a>
+  </div>
+  <div class="hero-right fade-up delay-3">
+    <div class="big-stat"><div class="num">$2.16M</div><div class="label">Projected annual energy savings per depot cluster</div></div>
+    <div class="big-stat"><div class="num">40%</div><div class="label">Fleet energy cost reduction via smart charging AI</div></div>
+    <div class="big-stat"><div class="num">$558B</div><div class="label">Global EV logistics market size by 2030 (CAGR 31.5%)</div></div>
+    <div class="big-stat"><div class="num">1,800+</div><div class="label">AMZL sites this playbook is designed to scale across</div></div>
+  </div>
+</div>
+
+<div class="divider"></div>
+
+<!-- PROBLEM -->
+<section id="problem">
+<div class="section-wrap">
+  <div class="section-label">01 — Problem</div>
+  <div class="section-title">Five Gaps Blocking Amazon's EV Scale</div>
+  <div class="problem-grid">
+    <div class="problem-card" data-num="01"><div class="problem-icon">⚡</div><h3>Limited Charging Infrastructure</h3><p>Depots lack sufficient chargers and grid capacity, delaying fleet electrification and limiting EV deployment at scale across 1,800 sites.</p></div>
+    <div class="problem-card" data-num="02"><div class="problem-icon">🔧</div><h3>Manual Coordination</h3><p>Static charging schedules leave vans undercharged at shift start. Manual routing creates delays, high costs, and operational errors daily.</p></div>
+    <div class="problem-card" data-num="03"><div class="problem-icon">🚐</div><h3>Congestion & Inefficient Yard Flow</h3><p>Vans idle and queue, blocking bays and slowing yard flow — reducing charger utilization and delaying morning dispatch windows.</p></div>
+    <div class="problem-card" data-num="04"><div class="problem-icon">💰</div><h3>High Energy & Grid Costs</h3><p>Peak-hour charging drives volatile energy spend. Without load intelligence, EV economics weaken and grid upgrade costs spike.</p></div>
+    <div class="problem-card" data-num="05"><div class="problem-icon">🧩</div><h3>Fragmented Systems</h3><p>Routing, charging, and scheduling systems don't talk to each other. No central visibility means missed performance goals at scale.</p></div>
+    <div class="problem-card" data-num="06" style="background:rgba(255,107,0,0.06);border:1px solid rgba(255,107,0,0.2)"><div class="problem-icon">🎯</div><h3>The Core Question</h3><p style="color:var(--white)">How can Amazon scale its EV fleet while achieving depot efficiency and net-zero carbon emissions by 2040 — across 10,000+ vehicles in 1,800 cities?</p></div>
+  </div>
+</div>
+</section>
+
+<div class="divider"></div>
+
+<!-- IMPACT -->
+<div class="impact-bg" id="impact">
+<div class="impact-inner">
+  <div class="section-label">02 — Quantified Impact</div>
+  <div class="section-title">Research-Backed Business Outcomes</div>
+  <div class="impact-grid">
+    <div class="impact-card"><div class="impact-num">40%</div><div class="impact-label">Fleet energy cost reduction via optimized charging</div><div class="impact-source">IEEE SmartGridComm 2023</div></div>
+    <div class="impact-card"><div class="impact-num">$2.16M</div><div class="impact-label">Annual savings per cluster — from $450K → $270K/month</div><div class="impact-source">12-Month ROI Trajectory</div></div>
+    <div class="impact-card"><div class="impact-num">-73%</div><div class="impact-label">Drop in peak-demand charges ($450K → $120K/month)</div><div class="impact-source">U.S. DOT Smart Charging Study 2024</div></div>
+    <div class="impact-card"><div class="impact-num">93%</div><div class="impact-label">Fleet readiness post-AI (up from 76%)</div><div class="impact-source">ICCT EV Charging Research 2023</div></div>
+  </div>
+  <div class="impact-grid" style="margin-top:1.5px">
+    <div class="impact-card"><div class="impact-num">15%</div><div class="impact-label">Last-mile delivery cost reduction via real-time re-routing</div><div class="impact-source">McKinsey Route Optimization Study</div></div>
+    <div class="impact-card"><div class="impact-num">20%</div><div class="impact-label">Depot congestion reduction via predictive stall allocation</div><div class="impact-source">DHL AnyLogic Simulation Benchmark</div></div>
+    <div class="impact-card"><div class="impact-num">15%+</div><div class="impact-label">Battery life extension via battery-aware scheduling AI</div><div class="impact-source">Technology Assessment — WATCV Analysis</div></div>
+    <div class="impact-card"><div class="impact-num">$558B</div><div class="impact-label">Global EV logistics market size by 2030 at CAGR 31.5%</div><div class="impact-source">Allied Market Research 2024</div></div>
+  </div>
+</div>
+</div>
+
+<div class="divider"></div>
+
+<!-- COMPETITIVE -->
+<section id="competitive">
+<div class="section-wrap">
+  <div class="section-label">03 — Competitive Landscape</div>
+  <div class="section-title">Where Competitors Stand. Where Amazon Wins.</div>
+  <div class="highlight-box" style="margin-bottom:2rem">
+    <p>Amazon is uniquely positioned — combining the most advanced AI capabilities with full operational integration across routing, charging, and yard management. Competitors typically lead in only one area. This dual strength sets Amazon apart in logistics innovation and defines the white space the Depot Orchestrator fills.</p>
+  </div>
+  <table class="comp-table">
+    <thead><tr><th>Company</th><th>Current AI Capability</th><th>Gap vs. Depot Orchestrator</th></tr></thead>
+    <tbody>
+      <tr><td>DHL</td><td>AnyLogic simulations — reduces depot congestion 20%, throughput +15%</td><td>Depot-only; no charging or routing integration</td></tr>
+      <tr><td>UPS</td><td>ORION predictive routing — saves 100M+ delivery miles annually</td><td>Routing-only; no EV charging or yard orchestration</td></tr>
+      <tr><td>FedEx</td><td>AI-assisted yard automation and digital twin demand forecasting</td><td>Siloed systems; no unified EV + routing + yard layer</td></tr>
+      <tr><td>Walmart</td><td>Digital twins for operations optimization and demand forecasting</td><td>Retail-focused; last-mile EV depot integration absent</td></tr>
+      <tr><td>ChargePoint / Enel X</td><td>EV charging stations, load management, grid balancing</td><td>Charging-only; no routing or yard orchestration layer</td></tr>
+      <tr class="amazon-row"><td>Amazon (Proposed)</td><td>Unified AI — charging + routing + yard in one orchestrated system</td><td>First mover: only integrated EV depot AI at this scale</td></tr>
+    </tbody>
+  </table>
+</div>
+</section>
+
+<div class="divider"></div>
+
+<!-- ROADMAP -->
+<section>
+<div class="section-wrap">
+  <div class="section-label">04 — Implementation Roadmap</div>
+  <div class="section-title">12-Month Deployment Plan</div>
+  <div class="roadmap">
+    <div class="road-step"><div class="road-dot"></div><div class="road-phase">Month 1–2</div><div class="road-title">Pilot Key Depots</div><div class="road-desc">Select 2–3 high-volume EV depots. Benchmark energy use, delay times, and dispatch readiness.</div></div>
+    <div class="road-step"><div class="road-dot"></div><div class="road-phase">Month 3–5</div><div class="road-title">Sequential AI Module Deployment</div><div class="road-desc">Deploy Smart Charging Scheduler → Route Optimization AI → Yard Flow Orchestrator in sequence.</div></div>
+    <div class="road-step"><div class="road-dot"></div><div class="road-phase">Month 6–9</div><div class="road-title">App Interface Rollout</div><div class="road-desc">Equip drivers and depot managers with unified real-time app for charging, routing, and occupancy.</div></div>
+    <div class="road-step"><div class="road-dot"></div><div class="road-phase">Month 10–12</div><div class="road-title">Optimize & Scale</div><div class="road-desc">Analyze ROI on energy savings and delivery KPIs. Build scalable playbook for 1,800+ AMZL sites.</div></div>
+  </div>
+</div>
+</section>
+
+<div class="divider"></div>
+
+<!-- DELIVERABLES — EXPANDABLE -->
+<div id="deliverables">
+<div class="deliverables-section">
+  <div class="section-label">05 — Project Deliverables</div>
+  <div class="section-title">Click Any Deliverable to Explore</div>
+
+  <!-- 1. COMPETITIVE ANALYSIS -->
+  <div class="deliverable-item" id="item-comp">
+    <button class="deliverable-trigger" onclick="toggle('item-comp')">
+      <div class="trigger-left">
+        <span class="trigger-num">01</span>
+        <div><div class="trigger-title">Competitive Landscape Analysis</div><div class="trigger-desc">SWOT · AI Depth vs Integration · Market Sizing · Peer Benchmarking</div></div>
+      </div>
+      <span class="trigger-arrow">▼</span>
+    </button>
+    <div class="deliverable-body">
+      <div class="deliverable-body-inner">
+        <div class="highlight-box"><p>Structured competitive benchmarking of Amazon's AI positioning against DHL, UPS, FedEx, Walmart, and charging infrastructure players — using a consulting-grade methodology including SWOT, issue tree mapping, and value-driver logic.</p></div>
+        <div class="inner-grid-2" style="margin-bottom:1.5rem">
+          <div><p style="font-size:0.82rem;color:var(--muted);margin-bottom:0.75rem">Research methodology applied standard consulting engagement structure: problem scoping, secondary research from Amazon official disclosures, industry reports, and UIUC library resources on EV logistics and smart infrastructure.</p>
+          <div class="tag-row"><span class="tag">SWOT Analysis</span><span class="tag">Issue Tree Mapping</span><span class="tag">Value-Driver Logic</span><span class="tag">Secondary Research</span><span class="tag">Strategic Feasibility</span></div></div>
+          <div class="inner-card"><h4>Market Size</h4><p>Global electric commercial vehicle market projected to reach <strong style="color:var(--white)">$558B by 2030</strong> at a CAGR of 31.5% (Allied Market Research, 2024). Amazon alone has committed over $1B to electrify last-mile operations. Each EV depot averages $500K–$2M in infrastructure investment (McKinsey, 2023).</p></div>
+        </div>
+        <div class="swot-grid">
+          <div class="swot-card s"><h4>⬆ Strengths</h4><ul><li>10,000+ EVs in 1,800 cities via Rivian, BrightDrop & Mercedes-Benz with integrated telematics</li><li>32,000+ chargers across 180+ depots — full control over routing, charging, timing</li><li>Smart in-vehicle AI vision tools already reducing delivery time</li></ul></div>
+          <div class="swot-card w"><h4>⬇ Weaknesses</h4><ul><li>High setup costs for chargers, grid upgrades, and system integration</li><li>No native grid optimization — lacks built-in peak-demand management</li><li>Rivian production delays disrupting electrification timelines</li></ul></div>
+          <div class="swot-card o"><h4>→ Opportunities</h4><ul><li>Set industry benchmark for AI-powered depot operations in EV logistics</li><li>Regulatory tailwinds: zero-emission delivery zones pushing AI adoption</li><li>SaaS monetization potential — productize depot AI for 3rd-party DSPs (like AWS)</li></ul></div>
+          <div class="swot-card t"><h4>⚠ Threats</h4><ul><li>Operational resistance from teams resistant to AI automation</li><li>Regulatory delays on emissions, zoning, and safety compliance</li><li>Fleet integration complexity across diverse EV models vs. competitors with unified fleets</li></ul></div>
+        </div>
+        <table class="inner-table">
+          <thead><tr><th>Peer Cluster</th><th>Key Players</th><th>Core Focus</th><th>Amazon's Relative Position</th></tr></thead>
+          <tbody>
+            <tr><td>Route Optimization</td><td>Route4Me, Samsara, Geotab, Locus.sh</td><td>AI-based route planning, fleet telematics</td><td>Amazon combines route optimization with charging and operational orchestration</td></tr>
+            <tr><td>Charging Infrastructure</td><td>ChargePoint, Schneider Electric, ABB, Enel X</td><td>EV charging stations, load management, grid balancing</td><td>Amazon integrates charging optimization into routing and scheduling platform</td></tr>
+            <tr><td>Integrated EV Fleet Ops</td><td>Rivian Fleet, BrightDrop (GM), FedEx, UPS</td><td>End-to-end EV logistics: vehicles, charging, delivery</td><td>Amazon leverages in-house fleet + AWS analytics for scale beyond OEMs</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <!-- 2. USER ANALYSIS -->
+  <div class="deliverable-item" id="item-user">
+    <button class="deliverable-trigger" onclick="toggle('item-user')">
+      <div class="trigger-left">
+        <span class="trigger-num">02</span>
+        <div><div class="trigger-title">User Analysis & Persona Research</div><div class="trigger-desc">4 User Personas · Pain Points · Adoption Readiness · AI Vision Mapping</div></div>
+      </div>
+      <span class="trigger-arrow">▼</span>
+    </button>
+    <div class="deliverable-body">
+      <div class="deliverable-body-inner">
+        <div class="highlight-box"><p>Structured user research identifying 4 distinct stakeholder groups — Depot Managers, Drivers, Fleet Analysts, and Maintenance Engineers — with distinct pain points, AI readiness levels, and transformation goals mapped to the Orchestrator's solution design.</p></div>
+        <div class="inner-grid-2" style="margin-bottom:2rem">
+          <div class="persona-card">
+            <div class="persona-header"><div class="persona-avatar">🚐</div><div><div class="persona-name">James, Delivery Driver</div><div class="persona-role">Age 38 · Illinois · 5 miles from depot</div></div></div>
+            <p class="persona-detail"><strong>AI Readiness:</strong> Low — needs simple, guided mobile UI</p>
+            <div class="persona-quote">"I'm racing time every evening — hoping my van is fully charged and I don't get stuck in a depot jam."</div>
+            <p class="persona-detail" style="color:var(--muted);font-size:0.78rem"><strong>Pain Points:</strong> Range anxiety, unclear charging status, manual paperwork, last-minute stall reassignments, no real-time route updates based on battery level.</p>
+            <p class="persona-detail" style="color:var(--muted);font-size:0.78rem;margin-top:0.5rem"><strong>AI Outcome:</strong> Smart routing with live traffic and charger updates, clear shift handoff with charge readiness confirmation.</p>
+          </div>
+          <div class="persona-card">
+            <div class="persona-header"><div class="persona-avatar">📊</div><div><div class="persona-name">Sarah, Depot Manager</div><div class="persona-role">Age 45 · Illinois · 12 miles from HQ</div></div></div>
+            <p class="persona-detail"><strong>AI Readiness:</strong> Moderate — needs workshops on interpreting AI dashboard outputs</p>
+            <div class="persona-quote">"I spend hours manually scheduling routes and allocating charging slots. I need a system that gives me real-time visibility."</div>
+            <p class="persona-detail" style="color:var(--muted);font-size:0.78rem"><strong>Pain Points:</strong> Manual overload in scheduling, limited visibility into vehicle readiness, fluctuating energy costs complicating budgeting, coordination delays.</p>
+            <p class="persona-detail" style="color:var(--muted);font-size:0.78rem;margin-top:0.5rem"><strong>AI Outcome:</strong> Real-time scheduling recommendations, live yard occupancy, congestion forecasting, and shift planning console.</p>
+          </div>
+          <div class="persona-card">
+            <div class="persona-header"><div class="persona-avatar">📈</div><div><div class="persona-name">Marcus, Fleet Analyst</div><div class="persona-role">Age 31 · Illinois · 8 miles from depot</div></div></div>
+            <p class="persona-detail"><strong>AI Readiness:</strong> High — ready for sandbox experimentation and model documentation</p>
+            <div class="persona-quote">"Data analysis is too time-consuming. I need AI-powered automation for real-time KPIs and anomaly detection."</div>
+            <p class="persona-detail" style="color:var(--muted);font-size:0.78rem"><strong>Pain Points:</strong> Manual data consolidation across dashboards, limited predictive capability, time-consuming cost-per-mile and charge efficiency analysis.</p>
+            <p class="persona-detail" style="color:var(--muted);font-size:0.78rem;margin-top:0.5rem"><strong>AI Outcome:</strong> Automated trend detection, anomaly alerts, real-time KPI dashboards, automated reporting.</p>
+          </div>
+          <div class="persona-card">
+            <div class="persona-header"><div class="persona-avatar">🔧</div><div><div class="persona-name">Priya, Maintenance Engineer</div><div class="persona-role">Age 42 · Illinois · 10 miles from depot</div></div></div>
+            <p class="persona-detail"><strong>AI Readiness:</strong> Moderate — needs AI alerts embedded in existing maintenance software</p>
+            <div class="persona-quote">"I follow reactive maintenance cycles. I need predictive alerts before breakdowns happen, not after."</div>
+            <p class="persona-detail" style="color:var(--muted);font-size:0.78rem"><strong>Pain Points:</strong> Reactive-only maintenance, no predictive alerts for charger faults or battery wear, limited fleet diagnostic visibility.</p>
+            <p class="persona-detail" style="color:var(--muted);font-size:0.78rem;margin-top:0.5rem"><strong>AI Outcome:</strong> Predictive maintenance alerts, battery health monitoring, automated work orders, advance repair planning.</p>
+          </div>
+        </div>
+        <table class="inner-table">
+          <thead><tr><th>User Group</th><th>Current Data Usage</th><th>AI Enhancement</th><th>Adoption Readiness</th></tr></thead>
+          <tbody>
+            <tr><td>Depot Managers</td><td>Fleet logs, charge times</td><td>AI-driven dashboards & scheduling recommendations</td><td>Moderate — workshops needed</td></tr>
+            <tr><td>Drivers</td><td>Route data, charge status</td><td>Smart route suggestions & predictive alerts</td><td>Low — simple guided mobile UI</td></tr>
+            <tr><td>Fleet Analysts</td><td>Operational & performance data</td><td>Automated trend detection & KPI dashboards</td><td>High — sandbox-ready</td></tr>
+            <tr><td>Maintenance Engineers</td><td>Maintenance logs</td><td>Predictive analytics for part failure & battery health</td><td>Moderate — alert integration needed</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <!-- 3. TECHNOLOGY ASSESSMENT -->
+  <div class="deliverable-item" id="item-tech">
+    <button class="deliverable-trigger" onclick="toggle('item-tech')">
+      <div class="trigger-left">
+        <span class="trigger-num">03</span>
+        <div><div class="trigger-title">Technology Assessment (WATCV Analysis)</div><div class="trigger-desc">5 AI Modules · Benefits Table · Risks & Challenges · Industry Tailwinds</div></div>
+      </div>
+      <span class="trigger-arrow">▼</span>
+    </button>
+    <div class="deliverable-body">
+      <div class="deliverable-body-inner">
+        <div class="highlight-box"><p>Evaluated 5 core AI technology areas for feasibility, deployment readiness, and business impact — mapped to specific operational pain points across the AMZL depot ecosystem. Identified proven vendor solutions, benchmarked results, and industry tailwinds supporting immediate deployment.</p></div>
+        <div class="inner-grid-3" style="margin-bottom:2rem">
+          <div class="inner-card"><h4>⚡ Smart EMS</h4><p>Minimize energy cost and avoid grid spikes. ML-driven scheduling avoids peak tariffs, prevents power spikes. Deploy: Ampcontrol AI or Enel X JuiceNet. Proven: 30–40% energy cost savings.</p></div>
+          <div class="inner-card"><h4>🗺 Route + Charge AI</h4><p>Match state-of-charge with route urgency. AI dynamically plans most efficient routes nightly using traffic, battery data, and weather. Deploy: Google Fleet Routing API. Proven: UPS ORION saves 100M+ miles/year.</p></div>
+          <div class="inner-card"><h4>🅿 Yard Flow Simulation</h4><p>Avoid congestion, assign stalls optimally. Simulation forecasts van movements, assigns vehicles to optimal stalls. Deploy: AnyLogic or Simio. Proven: DHL 20% congestion reduction.</p></div>
+          <div class="inner-card"><h4>🔋 Battery AI</h4><p>Protect from fast-charging stress. Neural networks track battery health patterns, prevent overcharging and high-SoC cycles, extending battery life 15%+.</p></div>
+          <div class="inner-card"><h4>👥 Shift Interface</h4><p>Real-time handoffs for drivers and depot managers. Driver app: charging overview, dynamic route dashboard, shift handoff. Manager app: live occupancy, congestion forecast, stall planning.</p></div>
+          <div class="inner-card"><h4>📈 Industry Tailwinds</h4><p>Zero-emission delivery mandates (US & EU), rising energy tariff complexity, mandatory ESG reporting, AI adoption in fleet ops by competitors, and SaaS monetization potential for 3rd-party DSPs.</p></div>
+        </div>
+        <table class="inner-table" style="margin-bottom:1.5rem">
+          <thead><tr><th>Benefit</th><th>Enabled By</th><th>Why It Matters</th></tr></thead>
+          <tbody>
+            <tr><td>Lower Total Cost of Ownership</td><td>Route AI + Smart Charging + Predictive Maintenance</td><td>Fewer miles driven, optimized charging, minimized unplanned repairs</td></tr>
+            <tr><td>Higher Fleet Utilization</td><td>Predictive Routing + Real-Time Fleet Telemetry</td><td>Less idle time, more deliveries per shift, dynamic vehicle allocation</td></tr>
+            <tr><td>Better Driver Workflows</td><td>AI-assisted Scheduling + Just Enough Charge Guidance</td><td>Smoother dispatch, optimized charging, reduced driver stress</td></tr>
+            <tr><td>Faster, More Reliable EV Dispatch</td><td>Integrated Route & Charge Co-Planning</td><td>Optimized routes and intelligent charging ensure on-time departures</td></tr>
+            <tr><td>Battery Life Extension (15%+)</td><td>Battery-Aware Scheduling</td><td>Avoids high SoC + heat charging = fewer battery replacements</td></tr>
+            <tr><td>Actionable Operational Insights</td><td>Real-Time Fleet Telemetry + AI Dashboards</td><td>Ops teams get proactive alerts to fix bottlenecks fast</td></tr>
+          </tbody>
+        </table>
+        <p style="font-size:0.8rem;color:var(--amber);font-family:'DM Mono',monospace;letter-spacing:0.1em;margin-bottom:1rem">RISKS & MITIGATIONS</p>
+        <div class="inner-grid-2">
+          <div class="inner-card"><h4>Infrastructure Mismatch</h4><p>Depot charger types and grid strengths differ. Mitigation: modular, adaptable design with configurable hardware abstraction layer.</p></div>
+          <div class="inner-card"><h4>Operational Resistance</h4><p>AI introduces workflow changes. Mitigation: co-design pilot programs, human-in-the-loop design, gradual automation rollout.</p></div>
+          <div class="inner-card"><h4>Integration Complexity</h4><p>Legacy systems are hard to connect. Mitigation: open APIs and middleware data links to reduce disruption to existing systems.</p></div>
+          <div class="inner-card"><h4>Model Drift & Data Governance</h4><p>AI accuracy drops without retraining; real-time tracking raises GDPR/CCPA concerns. Mitigation: continuous monitoring, early compliance design, transparent data policies.</p></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 4. ISSUE TREE -->
+  <div class="deliverable-item" id="item-issue">
+    <button class="deliverable-trigger" onclick="toggle('item-issue')">
+      <div class="trigger-left">
+        <span class="trigger-num">04</span>
+        <div><div class="trigger-title">Issue Tree — Structured Problem Decomposition</div><div class="trigger-desc">6 Branches · Users · Regulatory · AI Technologies · Competitive Landscape · Financial · Operational Constraints</div></div>
+      </div>
+      <span class="trigger-arrow">▼</span>
+    </button>
+    <div class="deliverable-body">
+      <div class="deliverable-body-inner">
+        <div class="highlight-box"><p>Root question: How can Amazon optimize its electric delivery fleet to minimize costs and emissions, maintain battery health, and ensure timely deliveries with maximum vehicle uptime? Decomposed into 6 structured branches covering all dimensions of the problem space.</p></div>
+        <div class="issue-branch"><div class="issue-branch-title">👥 Users / Stakeholders</div><div class="issue-items"><span class="issue-item">Depot/Site Managers</span><span class="issue-item">Shift Leads</span><span class="issue-item">Drivers</span><span class="issue-item">Fleet/Energy Managers</span><span class="issue-item">EV Ecosystem Players</span></div></div>
+        <div class="issue-branch"><div class="issue-branch-title">⚙️ AI Technologies</div><div class="issue-items"><span class="issue-item">Smart Charging & Scheduling</span><span class="issue-item">Battery Health Monitoring</span><span class="issue-item">Fleet Clustering & Forecasting</span><span class="issue-item">Route Optimization</span><span class="issue-item">Load balancing algorithms</span><span class="issue-item">Deep learning real-time routing</span><span class="issue-item">Neural networks for battery health</span><span class="issue-item">Constraint optimization</span><span class="issue-item">Time-series delivery demand models</span></div></div>
+        <div class="issue-branch"><div class="issue-branch-title">🏢 Competitive Landscape</div><div class="issue-items"><span class="issue-item">E-commerce & Retail Players</span><span class="issue-item">Major Logistics Carriers</span><span class="issue-item">Competitor advantages in charging</span><span class="issue-item">Stricter delivery time guarantees</span></div></div>
+        <div class="issue-branch"><div class="issue-branch-title">📋 Regulatory & Operational Constraints</div><div class="issue-items"><span class="issue-item">Grid and Tariff Rules</span><span class="issue-item">Physical & Technical Limits</span><span class="issue-item">Route and utilization restrictions</span><span class="issue-item">Regional tariff and electricity pricing</span><span class="issue-item">Target SoC vs route needs</span><span class="issue-item">Charging infrastructure capacity</span><span class="issue-item">Compliance with emissions reporting</span><span class="issue-item">Peak-demand infrastructure limits</span><span class="issue-item">Depot facility readiness</span><span class="issue-item">Operational variability</span></div></div>
+        <div class="issue-branch"><div class="issue-branch-title">💰 Financial & Economic Factors</div><div class="issue-items"><span class="issue-item">ROI and Risk Consideration</span><span class="issue-item">High peak-kW energy costs</span><span class="issue-item">Upfront investment vs efficiency gains</span><span class="issue-item">Change management program costs</span><span class="issue-item">Model updates and retraining costs</span><span class="issue-item">Vendor / consultant support fees</span><span class="issue-item">Contingency for regulatory issues</span></div></div>
+        <div class="issue-branch"><div class="issue-branch-title">🔄 Monitoring, Training & Change Management</div><div class="issue-items"><span class="issue-item">Training on AI platforms</span><span class="issue-item">Ongoing system maintenance</span><span class="issue-item">Schedule disruptions from last-minute route changes</span><span class="issue-item">Uncertainty around emerging battery tech</span><span class="issue-item">Communication gaps with charging operations</span><span class="issue-item">Dependency on third-party charging providers</span><span class="issue-item">Integration challenges with EMS</span></div></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 5. SOLUTION DECK -->
+  <div class="deliverable-item" id="item-final">
+    <button class="deliverable-trigger" onclick="toggle('item-final')">
+      <div class="trigger-left">
+        <span class="trigger-num">05</span>
+        <div><div class="trigger-title">Final Deliverable — Executive Recommendation Deck</div><div class="trigger-desc">3 AI Solutions · App Prototypes · Financial Analysis · 12-Month Roadmap · Presented to Program Leadership</div></div>
+      </div>
+      <span class="trigger-arrow">▼</span>
+    </button>
+    <div class="deliverable-body">
+      <div class="deliverable-body-inner">
+        <div class="highlight-box"><p>23-slide executive presentation covering situation analysis, AI solution design, app interface prototypes (Driver + Depot Manager views), financial ROI modeling, competitive positioning, and a phased 12-month deployment roadmap. Presented as the final course deliverable in December 2025.</p></div>
+        <div class="inner-grid-3" style="margin-bottom:2rem">
+          <div class="inner-card"><h4>AI Solution 1 — Smart Charging</h4><p>Predictive off-peak charging scheduler. Cuts energy costs 40%, peak-demand charges from $450K → $120K/month. Deploy: Ampcontrol AI or Enel X JuiceNet.</p></div>
+          <div class="inner-card"><h4>AI Solution 2 — Route Optimization</h4><p>ML models using parcel volume, weather, battery SoC. Cuts last-mile costs 15%, improves on-time delivery 8–12%. Deploy: Google Fleet Routing API.</p></div>
+          <div class="inner-card"><h4>AI Solution 3 — Yard Orchestration</h4><p>Simulation-based stall assignment and exit-flow management. Reduces depot congestion 20%, trailer movement efficiency +35%. Deploy: AnyLogic or Simio.</p></div>
+        </div>
+        <div class="inner-grid-2">
+          <div class="inner-card"><h4>Driver App Features</h4><ul><li>Charging Overview: Real-time SoC, next stall, active tariff window — saves 12% energy per shift</li><li>Dynamic Route Dashboard: Traffic + battery-aware routing, eliminates surprise detours</li><li>Shift Handoff: Clear stall, charge readiness, and departure window confirmation</li></ul></div>
+          <div class="inner-card"><h4>Depot Manager App Features</h4><ul><li>Live Yard Occupancy: Real-time stall usage, instant blockage alerts</li><li>Congestion Forecast: Predictive AI suggestions to prevent buildup before it starts</li><li>Shift Planning Console: Rebalance vans across stalls, prioritize early-route charging</li></ul></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 6. SCOPING DOC -->
+  <div class="deliverable-item" id="item-scope">
+    <button class="deliverable-trigger" onclick="toggle('item-scope')">
+      <div class="trigger-left">
+        <span class="trigger-num">06</span>
+        <div><div class="trigger-title">Project Scoping Document</div><div class="trigger-desc">Objective · Scope · Stakeholder Map · Success Criteria · Constraints</div></div>
+      </div>
+      <span class="trigger-arrow">▼</span>
+    </button>
+    <div class="deliverable-body">
+      <div class="deliverable-body-inner">
+        <div class="inner-grid-2">
+          <div class="inner-card"><h4>Project Objective</h4><p>Develop a strategic blueprint for an AI-powered depot orchestrator that improves charging coordination, van readiness, and yard efficiency — to help Amazon Logistics scale its EV operations without building production software.</p></div>
+          <div class="inner-card"><h4>Strategic Context</h4><p>Aligns with Amazon's goal of achieving net-zero carbon emissions by 2040 and supports operational efficiency across its last-mile logistics network. Amazon operates 32,000+ EV chargers across 180+ U.S. delivery stations.</p></div>
+          <div class="inner-card"><h4>Scope of Work</h4><p>Identified key bottlenecks, analyzed industry best practices, evaluated charging and yard operations, and designed an AI orchestration concept tailored to depot environments.</p></div>
+          <div class="inner-card"><h4>What This Project Covers</h4><p>Strategic recommendations, competitive benchmarking, stakeholder workflows, feasibility and risk assessments, and a high-level roadmap for phased orchestration deployment across 1,800+ AMZL sites.</p></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+</div>
+</div>
+
+<!-- ABOUT -->
+<div class="about-section" id="about">
+  <div class="about-inner">
+    <div><div class="about-name">Vanshika Thakkar</div><div class="about-role">MS Information Management · UIUC · GPA 4.0</div></div>
+    <div>
+      <p class="about-text">I work at the intersection of data, strategy, and product. This project was produced across IS 534 — Information Consulting at UIUC, where I served as Project Manager across all six deliverables — scoping, competitive analysis, technology assessment, user research, issue tree, and final executive recommendation. My background spans enterprise analytics at Deloitte, financial operations at Colgate-Palmolive, and federal data infrastructure at UIUC's Business Intelligence Group.</p>
+      <div class="about-links">
+        <a href="https://linkedin.com/in/vanshika-thakkar" class="about-link" target="_blank">LinkedIn</a>
+        <a href="https://github.com/vanshikathakkar2002" class="about-link" target="_blank">GitHub</a>
+        <a href="mailto:vtt2@illinois.edu" class="about-link">Email</a>
+      </div>
+    </div>
+  </div>
+</div>
+
+<footer>
+  <p>© 2025 Vanshika Thakkar · IS 534 Information Consulting · UIUC</p>
+  <p>Built for emtelligent application · April 2026</p>
+</footer>
+
+<script>
+function toggle(id) {
+  const item = document.getElementById(id);
+  const body = item.querySelector('.deliverable-body');
+  const isOpen = item.classList.contains('open');
+
+  // Close all
+  document.querySelectorAll('.deliverable-item').forEach(el => {
+    el.classList.remove('open');
+    el.querySelector('.deliverable-body').style.maxHeight = '0';
+  });
+
+  // Open clicked if it was closed
+  if (!isOpen) {
+    item.classList.add('open');
+    body.style.maxHeight = body.scrollHeight + 'px';
+    // Smooth scroll to item
+    setTimeout(() => item.scrollIntoView({ behavior: 'smooth', block: 'start' }), 100);
+  }
+}
+</script>
+
+</body>
+</html>
